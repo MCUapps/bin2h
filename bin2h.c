@@ -27,21 +27,25 @@ int main(int argc, char *argv[])
 	if (!dest)
 		ErrorCleanup(res, ERR_BAD_DEST);
 
-	fprintf(dest, "unsigned char %s[] = {", argv[3]);
-	k = 0;
-
+	fprintf(dest, "static unsigned char %s[] = {\n\t", argv[3]);
+	ch = fgetc(src);
+	fprintf(dest, "0x%02x", ch);
+	k = 1;
+	ch = fgetc(src);
 	while (1)
 	{
-		ch = fgetc(src);
-
 		if (feof(src))
 			break;
-		
+		fprintf(dest, ",");
+
 		k = k % LINE_MAX_DATA;
 		if (k++ == 0)
-			fprintf(dest, "\n");
+			fprintf(dest, "\n\t");
+		else
+			fprintf(dest, " ");
+		fprintf(dest, "0x%02x", ch);
 
-		fprintf(dest, "0x%02x, ", ch);
+		ch = fgetc(src);
 	}
 
 	fprintf(dest, "\n};\n");
